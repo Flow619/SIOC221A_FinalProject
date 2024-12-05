@@ -25,8 +25,8 @@ CSV_Files = dir;
 CSV_Files = {CSV_Files(3:end-1).name}';
 
 if Deployment_Num == 1
-    for i = 3:length(CSV_Files)-1
-        if i == 3
+    for i = 1:length(CSV_Files)-1
+        if i == 1
             Data = readtable(CSV_Files{i});
         else
             Temp = readtable(CSV_Files{i});
@@ -43,6 +43,15 @@ elseif Deployment_Num == 2
         end
     end
 end
+
+%% Plot: Demonstrating the Issue with Time Steps
+
+figure
+plot(1:size(Data,1)-1, diff(Data.millis)/1000,'linewidth',3)
+ylabel('\Delta{t} [sec]')
+xlabel('Time Step #')
+title(['Deployment #',num2str(Deployment_Num)])
+set(gca,'fontsize',20)
 
 %% Truncate usable timeseries
 if Deployment_Num == 1
