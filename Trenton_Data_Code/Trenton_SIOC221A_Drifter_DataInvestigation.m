@@ -11,7 +11,7 @@ addpath('C:\Users\Trenton\Documents\GitHub\SIOC221A\HW4')
 addpath('C:\Users\Trenton\Documents\GitHub\SIOC221A\HW3')
 
 %% User Defined
-Deployment_Num = 1; %Either #1 or #2
+Deployment_Num = 2; %Either #1 or #2
 
 %% Load Data
 if Deployment_Num == 1
@@ -22,24 +22,31 @@ end
 
 cd(FilePath)
 CSV_Files = dir;
-CSV_Files = {CSV_Files(3:end-1).name}';
+CSV_Files = {CSV_Files(3:end-1).name}'; % Pull File names
+
+figure
+hold on
 
 if Deployment_Num == 1
-    for i = 1:length(CSV_Files)-1
+    for i = 1:length(CSV_Files)
         if i == 1
             Data = readtable(CSV_Files{i});
+            plot(Data.millis,Data.accZ)
         else
             Temp = readtable(CSV_Files{i});
             Data = [Data;Temp];
+            plot(Temp.millis,Temp.accZ)
         end
     end
 elseif Deployment_Num == 2
     for i = 12:length(CSV_Files)
         if i == 12
             Data = readtable(CSV_Files{i});
+            plot(Data.millis,Data.accZ);
         else
             Temp = readtable(CSV_Files{i});
             Data = [Data;Temp];
+            plot(Temp.millis,Temp.accZ)
         end
     end
 end
