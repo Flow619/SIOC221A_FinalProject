@@ -82,14 +82,27 @@ elseif Deployment_Num == 2
         AccX{i-12} = AccX{i-12} - mean(AccX{i-12});
 
         % FFT (with hanning and demeaning)
-        [P_accZ{i-12},freq] = MySpectrum((Hanning.*AccZ{i-12}(1:900))',dt,"OFF");
-        [P_accY{i-12},freq] = MySpectrum((Hanning.*AccY{i-12}(1:900))',dt,"OFF");
-        [P_accX{i-12},freq] = MySpectrum((Hanning.*AccX{i-12}(1:900))',dt,"OFF");
+        [P_accZ_Chunk1{i-12},freq] = MySpectrum((Hanning.*AccZ{i-12}(1:600))',dt,"OFF");
+        [P_accY_Chunk1{i-12},freq] = MySpectrum((Hanning.*AccY{i-12}(1:600))',dt,"OFF");
+        [P_accX_Chunk1{i-12},freq] = MySpectrum((Hanning.*AccX{i-12}(1:600))',dt,"OFF");
+
+        [P_accZ_Chunk2{i-12},freq] = MySpectrum((Hanning.*AccZ{i-12}(151:750))',dt,"OFF");
+        [P_accY_Chunk2{i-12},freq] = MySpectrum((Hanning.*AccY{i-12}(151:750))',dt,"OFF");
+        [P_accX_Chunk2{i-12},freq] = MySpectrum((Hanning.*AccX{i-12}(151:750))',dt,"OFF");
+
+        [P_accZ_Chunk3{i-12},freq] = MySpectrum((Hanning.*AccZ{i-12}(301:900))',dt,"OFF");
+        [P_accY_Chunk3{i-12},freq] = MySpectrum((Hanning.*AccY{i-12}(301:900))',dt,"OFF");
+        [P_accX_Chunk3{i-12},freq] = MySpectrum((Hanning.*AccX{i-12}(301:900))',dt,"OFF");
+
 
         % Normalize for Hanning
-        P_accZ{i-12} = P_accZ{i-12}/ mean(Hanning.^2);
-        P_accY{i-12} = P_accY{i-12}/ mean(Hanning.^2);
-        P_accX{i-12}= P_accX{i-12}/ mean(Hanning.^2);
+        P_accZ_Chunk1{i-12} = P_accZ_Chunk1{i-12}/ mean(Hanning.^2);
+        P_accZ_Chunk2{i-12} = P_accZ_Chunk2{i-12}/ mean(Hanning.^2);
+        P_accZ_Chunk3{i-12} = P_accZ_Chunk3{i-12}/ mean(Hanning.^2);
+        
+        % Can repeat this process for X,Y,Z if desired.
+        % P_accY{i-12} = P_accY{i-12}/ mean(Hanning.^2);
+        % P_accX{i-12}= P_accX{i-12}/ mean(Hanning.^2);
     end
 end
 
