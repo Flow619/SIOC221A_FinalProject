@@ -13,6 +13,8 @@ addpath('C:\Users\Trenton\Documents\GitHub\SIOC221A\HW3')
 Deployment_Num = 1; % Either #1 or #2
 dt = 0.2 % sec;
 
+Save_Flag = "OFF";
+
 %% Load Data
 if Deployment_Num == 1
     FilePath = 'C:\Users\Trenton\Documents\GitHub\SIOC221A_FinalProject\drifter\data_dep1';
@@ -129,3 +131,17 @@ plot(freq,Mean_P,'k.-','LineWidth',4,'HandleVisibility','Off')
 set(gca,'FontSize',18)
 
 title(['Deployment #',num2str(Deployment_Num), ' with Chunking' ],'FontSize',20)
+
+%%  Save FFT Data
+if strcmp(Save_Flag,"ON")
+    cd('C:\Users\Trenton\Documents\GitHub\SIOC221A_FinalProject\Trenton_Data_Code\FIGURES')
+    if Deployment_Num == 1
+        Deploy1 = [P_accZ_Chunk1{:},P_accZ_Chunk2{:},P_accZ_Chunk3{:}]
+        save('FFT_Deploy1_Chunking','Deploy1',"freq")
+        exportgraphics(gcf,'FFT_Deployment1_Chunking.jpg','Resolution',300)
+    elseif Deployment_Num == 2
+        Deploy2 = [P_accZ_Chunk1{:},P_accZ_Chunk2{:},P_accZ_Chunk3{:}]
+        save('FFT_Deploy2_Chunking','Deploy2')
+        exportgraphics(gcf,'FFT_Deployment2_Chunking.jpg','Resolution',300)
+    end
+end
