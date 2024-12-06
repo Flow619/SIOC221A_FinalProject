@@ -111,7 +111,7 @@ Mean_P = mean([P_accZ_Chunk1{:},P_accZ_Chunk2{:},P_accZ_Chunk3{:}],2);
 
 %% Plot FFTs
 
-figure
+figure('units','normalized','outerposition',[0 0 1 1])
 hold on
 
 for ii = 1:size(P_accZ_Chunk1,2)
@@ -123,9 +123,7 @@ end
 
 yscale('log')
 xscale('log')
-
-l = legend
-title(l,'Segment #')
+ylim([10^-9 10^0])
 
 plot(freq,Mean_P,'k.-','LineWidth',4,'HandleVisibility','Off')
 set(gca,'FontSize',18)
