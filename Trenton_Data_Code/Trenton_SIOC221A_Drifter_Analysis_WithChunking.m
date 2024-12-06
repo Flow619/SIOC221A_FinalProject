@@ -10,7 +10,7 @@ addpath('C:\Users\Trenton\Documents\GitHub\SIOC221A\HW4')
 addpath('C:\Users\Trenton\Documents\GitHub\SIOC221A\HW3')
 
 %% User Defined
-Deployment_Num = 2; % Either #1 or #2
+Deployment_Num = 1; % Either #1 or #2
 dt = 0.2 % sec;
 
 %% Load Data
@@ -43,14 +43,26 @@ if Deployment_Num == 1
         AccX{i-2} = AccX{i-2} - mean(AccX{i-2});
 
         % FFT (with hanning and demeaning)
-        [P_accZ{i-2},freq] = MySpectrum( (Hanning.*AccZ{i-2}(1:900))',dt,"OFF");
-        [P_accY{i-2},freq] = MySpectrum( (Hanning.*AccY{i-2}(1:900))',dt,"OFF");
-        [P_accX{i-2},freq] = MySpectrum( (Hanning.*AccX{i-2}(1:900))',dt,"OFF");
+        [P_accZ_Chunk1{i-2},freq] = MySpectrum( (Hanning.*AccZ{i-2}(1:600))',dt,"OFF");
+        [P_accY_Chunk1{i-2},freq] = MySpectrum( (Hanning.*AccY{i-2}(1:600))',dt,"OFF");
+        [P_accX_Chunk1{i-2},freq] = MySpectrum( (Hanning.*AccX{i-2}(1:600))',dt,"OFF");
+
+        [P_accZ_Chunk2{i-2},freq] = MySpectrum( (Hanning.*AccZ{i-2}(151:750))',dt,"OFF");
+        [P_accY_Chunk2{i-2},freq] = MySpectrum( (Hanning.*AccY{i-2}(151:750))',dt,"OFF");
+        [P_accX_Chunk2{i-2},freq] = MySpectrum( (Hanning.*AccX{i-2}(151:750))',dt,"OFF");
+        
+        [P_accZ_Chunk3{i-2},freq] = MySpectrum( (Hanning.*AccZ{i-2}(301:900))',dt,"OFF");
+        [P_accY_Chunk3{i-2},freq] = MySpectrum( (Hanning.*AccY{i-2}(301:900))',dt,"OFF");
+        [P_accX_Chunk3{i-2},freq] = MySpectrum( (Hanning.*AccX{i-2}(301:900))',dt,"OFF");
 
         % Normalize for Hanning
-        P_accZ{i-2} = P_accZ{i-2}/ mean(Hanning.^2);
-        P_accY{i-2} = P_accY{i-2}/ mean(Hanning.^2);
-        P_accX{i-2} = P_accX{i-2}/ mean(Hanning.^2);
+        P_accZ_Chunk1{i-2} = P_accZ_Chunk1{i-2}/ mean(Hanning.^2);
+        P_accZ_Chunk2{i-2} = P_accZ_Chunk2{i-2}/ mean(Hanning.^2);                        
+        P_accZ_Chunk3{i-2} = P_accZ_Chunk3{i-2}/ mean(Hanning.^2);
+
+        % Can repeat this process for X,Y,Z if desired.
+        % P_accY{i-2} = P_accY{i-2}/ mean(Hanning.^2);
+        % P_accX{i-2} = P_accX{i-2}/ mean(Hanning.^2);
 
     end
 elseif Deployment_Num == 2
@@ -82,17 +94,18 @@ elseif Deployment_Num == 2
 end
 
 %% Calculate Mean FFT
-Mean_P = mean([P_accZ{:}],2);
+Mean_P = mean([P_accZ_Chunk1{:},P_accZ_Chunk2{:},P_accZ_Chunk3{:}],2);
 
 %% Plot FFTs
-
-Colors = jet(size(P_accZ,2));
 
 figure
 hold on
 
-for ii = 1:size(P_accZ,2)
-    plot(freq',P_accZ{ii},'color',[Colors(ii,:)],'linewidth',1,'DisplayName',num2str(ii)) %Plot each FFT
+for ii = 1:size(P_accZ_Chunk1,2)
+    plot(freq',P_accZ_Chunk1{ii},'linewidth',1) %Plot each FFT
+    plot(freq',P_accZ_Chunk2{ii},'linewidth',1) %Plot each FFT
+    plot(freq',P_accZ_Chunk3{ii},'linewidth',1) %Plot each FFT
+
 end
 
 yscale('log')
@@ -104,4 +117,4 @@ title(l,'Segment #')
 plot(freq,Mean_P,'k.-','LineWidth',4,'HandleVisibility','Off')
 set(gca,'FontSize',18)
 
-title(['Combined Deployments',num2str(Deployment_Num)],'FontSize',20)
+title(['Deployment #',num2str(Deployment_Num), ' with Chunking' ],'FontSize',20)
