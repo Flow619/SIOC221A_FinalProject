@@ -26,7 +26,7 @@ cd(FilePath)
 CSV_Files = dir;
 CSV_Files = {CSV_Files(3:end-1).name}'; % pull list of .csv names
 
-Hanning = hann(600); % hanning window
+Hanning = hann(450); % hanning window
 
 if Deployment_Num == 1
     for i = 3:length(CSV_Files)-2 % ***Only pull .csv files when drifter was in the water***
@@ -45,17 +45,17 @@ if Deployment_Num == 1
         AccX{i-2} = AccX{i-2} - mean(AccX{i-2});
 
         % FFT (with hanning and demeaning)
-        [P_accZ_Chunk1{i-2},freq] = MySpectrum( (Hanning.*AccZ{i-2}(1:600))',dt,"OFF");
-        [P_accY_Chunk1{i-2},freq] = MySpectrum( (Hanning.*AccY{i-2}(1:600))',dt,"OFF");
-        [P_accX_Chunk1{i-2},freq] = MySpectrum( (Hanning.*AccX{i-2}(1:600))',dt,"OFF");
+        [P_accZ_Chunk1{i-2},freq] = MySpectrum( (Hanning.*AccZ{i-2}(1:450))',dt,"OFF");
+        [P_accY_Chunk1{i-2},freq] = MySpectrum( (Hanning.*AccY{i-2}(1:450))',dt,"OFF");
+        [P_accX_Chunk1{i-2},freq] = MySpectrum( (Hanning.*AccX{i-2}(1:450))',dt,"OFF");
 
-        [P_accZ_Chunk2{i-2},freq] = MySpectrum( (Hanning.*AccZ{i-2}(151:750))',dt,"OFF");
-        [P_accY_Chunk2{i-2},freq] = MySpectrum( (Hanning.*AccY{i-2}(151:750))',dt,"OFF");
-        [P_accX_Chunk2{i-2},freq] = MySpectrum( (Hanning.*AccX{i-2}(151:750))',dt,"OFF");
+        [P_accZ_Chunk2{i-2},freq] = MySpectrum( (Hanning.*AccZ{i-2}(226:675))',dt,"OFF");
+        [P_accY_Chunk2{i-2},freq] = MySpectrum( (Hanning.*AccY{i-2}(226:675))',dt,"OFF");
+        [P_accX_Chunk2{i-2},freq] = MySpectrum( (Hanning.*AccX{i-2}(226:675))',dt,"OFF");
         
-        [P_accZ_Chunk3{i-2},freq] = MySpectrum( (Hanning.*AccZ{i-2}(301:900))',dt,"OFF");
-        [P_accY_Chunk3{i-2},freq] = MySpectrum( (Hanning.*AccY{i-2}(301:900))',dt,"OFF");
-        [P_accX_Chunk3{i-2},freq] = MySpectrum( (Hanning.*AccX{i-2}(301:900))',dt,"OFF");
+        [P_accZ_Chunk3{i-2},freq] = MySpectrum( (Hanning.*AccZ{i-2}(451:900))',dt,"OFF");
+        [P_accY_Chunk3{i-2},freq] = MySpectrum( (Hanning.*AccY{i-2}(451:900))',dt,"OFF");
+        [P_accX_Chunk3{i-2},freq] = MySpectrum( (Hanning.*AccX{i-2}(451:900))',dt,"OFF");
 
         % Normalize for Hanning
         P_accZ_Chunk1{i-2} = P_accZ_Chunk1{i-2}/ mean(Hanning.^2);
@@ -84,17 +84,17 @@ elseif Deployment_Num == 2
         AccX{i-12} = AccX{i-12} - mean(AccX{i-12});
 
         % FFT (with hanning and demeaning)
-        [P_accZ_Chunk1{i-12},freq] = MySpectrum((Hanning.*AccZ{i-12}(1:600))',dt,"OFF");
-        [P_accY_Chunk1{i-12},freq] = MySpectrum((Hanning.*AccY{i-12}(1:600))',dt,"OFF");
-        [P_accX_Chunk1{i-12},freq] = MySpectrum((Hanning.*AccX{i-12}(1:600))',dt,"OFF");
+        [P_accZ_Chunk1{i-12},freq] = MySpectrum((Hanning.*AccZ{i-12}(1:450))',dt,"OFF");
+        [P_accY_Chunk1{i-12},freq] = MySpectrum((Hanning.*AccY{i-12}(1:450))',dt,"OFF");
+        [P_accX_Chunk1{i-12},freq] = MySpectrum((Hanning.*AccX{i-12}(1:450))',dt,"OFF");
 
-        [P_accZ_Chunk2{i-12},freq] = MySpectrum((Hanning.*AccZ{i-12}(151:750))',dt,"OFF");
-        [P_accY_Chunk2{i-12},freq] = MySpectrum((Hanning.*AccY{i-12}(151:750))',dt,"OFF");
-        [P_accX_Chunk2{i-12},freq] = MySpectrum((Hanning.*AccX{i-12}(151:750))',dt,"OFF");
+        [P_accZ_Chunk2{i-12},freq] = MySpectrum((Hanning.*AccZ{i-12}(226:675))',dt,"OFF");
+        [P_accY_Chunk2{i-12},freq] = MySpectrum((Hanning.*AccY{i-12}(226:675))',dt,"OFF");
+        [P_accX_Chunk2{i-12},freq] = MySpectrum((Hanning.*AccX{i-12}(226:675))',dt,"OFF");
 
-        [P_accZ_Chunk3{i-12},freq] = MySpectrum((Hanning.*AccZ{i-12}(301:900))',dt,"OFF");
-        [P_accY_Chunk3{i-12},freq] = MySpectrum((Hanning.*AccY{i-12}(301:900))',dt,"OFF");
-        [P_accX_Chunk3{i-12},freq] = MySpectrum((Hanning.*AccX{i-12}(301:900))',dt,"OFF");
+        [P_accZ_Chunk3{i-12},freq] = MySpectrum((Hanning.*AccZ{i-12}(451:900))',dt,"OFF");
+        [P_accY_Chunk3{i-12},freq] = MySpectrum((Hanning.*AccY{i-12}(451:900))',dt,"OFF");
+        [P_accX_Chunk3{i-12},freq] = MySpectrum((Hanning.*AccX{i-12}(451:900))',dt,"OFF");
 
 
         % Normalize for Hanning
