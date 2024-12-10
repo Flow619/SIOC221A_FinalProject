@@ -19,29 +19,34 @@ for i = 1:length(csvFiles)
     data{i} = readtable(filepath);
 end
 
+fe = 5; % sampling rate in Hz
+fcut = 1/50; % cutoff frequencies for highpass filter
+order = 2; % order of butterworth highpass filter
 count = 1;
 for i = start_index(deployment):end_index(deployment)
-    acc_x{count} = data{i}.accX;
-    acc_y{count} = data{i}.accY;
-    acc_z{count} = data{i}.accZ;
-
-    vel_x{count} = cumtrapz(acc_x{count});
-    vel_y{count} = cumtrapz(acc_y{count});
-    vel_z{count} = cumtrapz(acc_z{count});
-
-    disp_x{count} = cumtrapz(cumtrapz(acc_x{count}));
-    disp_y{count} = cumtrapz(cumtrapz(acc_y{count}));
-    disp_z{count} = cumtrapz(cumtrapz(acc_z{count}));
+    % acc_x{count} = data{i}.accX;
+    % acc_y{count} = data{i}.accY;
+    % acc_z{count} = data{i}.accZ;
+    % 
+    % vel_x{count} = cumtrapz(acc_x{count});
+    % vel_y{count} = cumtrapz(acc_y{count});
+    % vel_z{count} = cumtrapz(acc_z{count});
+    % 
+    % disp_x{count} = cumtrapz(cumtrapz(acc_x{count}));
+    % disp_y{count} = cumtrapz(cumtrapz(acc_y{count}));
+    % disp_z{count} = cumtrapz(cumtrapz(acc_z{count}));
+    ACC = [data{i}.accX, data{i}.accY, data{i}.accZ]';
+    [acc{count}, vel{count}, disp{count}] = compute_DISP_high_pass(ACC, fe, fcut, order);
 
     count = count + 1;
 end
 
-dt = 0.2;
-nseg = 4;
+dt = 1/fe;
+nseg = 6;
 
 %% acceleration :
 for i = 1:count-1
-    vec = [acc_x{i}, acc_y{i}, acc_z{i}];
+    vec = acc{i}';
     x = sqrt(sum(vec.^2, 2));
     [Pout{i}, fout{i}, errbars{i}] = gabespectra(x, dt, nseg);
 end
@@ -63,12 +68,11 @@ set(gca, 'XScale','log', 'YScale','log')
 title('One-sided Power Spectrum');
 ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
 xlabel('Frequency [Hz]', 'Interpreter', 'latex');
-
-title(a, '$\sqrt{accX^2 + accY^2 + accZ^2}, \: 9 \: segments$', 'Interpreter', 'latex')
+title(a, ['$\sqrt{accX^2 + accY^2 + accZ^2}, \:', num2str(nseg), '\: segments', ', \: Deployment: \:', num2str(deployment), '$'], 'Interpreter', 'latex')
 
 %% velocity :
 for i = 1:count-1
-    vec = [vel_x{i}, vel_y{i}, vel_z{i}];
+    vec = vel{i}';
     x = sqrt(sum(vec.^2, 2));
     [Pout{i}, fout{i}, errbars{i}] = gabespectra(x, dt, nseg);
 end
@@ -90,13 +94,12 @@ set(gca, 'XScale','log', 'YScale','log')
 title('One-sided Power Spectrum');
 ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
 xlabel('Frequency [Hz]', 'Interpreter', 'latex');
-
-title(a, '$\sqrt{velX^2 + velY^2 + velZ^2}, \: 9 \: segments$', 'Interpreter', 'latex')
+title(a, ['$\sqrt{accX^2 + accY^2 + accZ^2}, \:', num2str(nseg), '\: segments', ', \: Deployment: \:', num2str(deployment), '$'], 'Interpreter', 'latex')
 
 %% displacement :
 
 for i = 1:count-1
-    vec = [disp_x{i}, disp_y{i}, disp_z{i}];
+    vec = disp{i}';
     x = sqrt(sum(vec.^2, 2));
     [Pout{i}, fout{i}, errbars{i}] = gabespectra(x, dt, nseg);
 end
@@ -116,15 +119,14 @@ for i = 1:count-1
 end
 
 % TODO: change these slopes (corresponds to wavenumber which is another ^-2)
-line1 = plot(fout{1}, fout{1}.^(-8));
-line2 = plot(fout{1}, fout{1}.^(-3));
+line1 = plot(fout{1}, fout{1}.^(-4), 'r-', 'LineWidth', 1.2);
+line2 = plot(fout{1}, fout{1}.^(-3), 'b-', 'LineWidth', 1.2);
 set(gca, 'XScale','log', 'YScale','log')
 title('One-sided Power Spectrum');
 ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
 xlabel('Frequency [Hz]', 'Interpreter', 'latex');
-legend([line1, line2], {'f^{-8}', 'f^{-3}'})
-
-title(a, '$\sqrt{X^2 + Y^2 + Z^2}, \: 9 \: segments$', 'Interpreter', 'latex')
+legend([line1, line2], {'f^{-4}', 'f^{-3}'})
+title(a, ['$\sqrt{accX^2 + accY^2 + accZ^2}, \:', num2str(nseg), '\: segments', ', \: Deployment: \:', num2str(deployment), '$'], 'Interpreter', 'latex')
 
 
 function [Pout, fout, errbars] = gabespectra(x, dt, nseg)
