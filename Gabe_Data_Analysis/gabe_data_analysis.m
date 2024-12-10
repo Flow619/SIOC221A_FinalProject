@@ -24,12 +24,22 @@ for i = start_index(deployment):end_index(deployment)
     acc_x{count} = data{i}.accX;
     acc_y{count} = data{i}.accY;
     acc_z{count} = data{i}.accZ;
+
+    vel_x{count} = cumtrapz(acc_x{count});
+    vel_y{count} = cumtrapz(acc_y{count});
+    vel_z{count} = cumtrapz(acc_z{count});
+
+    disp_x{count} = cumtrapz(cumtrapz(acc_x{count}));
+    disp_y{count} = cumtrapz(cumtrapz(acc_y{count}));
+    disp_z{count} = cumtrapz(cumtrapz(acc_z{count}));
+
     count = count + 1;
 end
 
 dt = 0.2;
-nseg = 9;
+nseg = 4;
 
+%% acceleration :
 for i = 1:count-1
     vec = [acc_x{i}, acc_y{i}, acc_z{i}];
     x = sqrt(sum(vec.^2, 2));
@@ -48,9 +58,6 @@ xlabel('Frequency [Hz]', 'Interpreter', 'latex');
 nexttile; hold on;
 for i = 1:count-1
     line_obj(i) = plot(fout{i}, Pout{i});
-    % errneg = Pout{i}(end) - errbars{i}(1)*Pout{i}(end);
-    % errpos = errbars{i}(2)*Pout{i}(end) - Pout{i}(end);
-    % errorbar(fout{i}(end)+i, Pout{i}(end), errneg, errpos)
 end
 set(gca, 'XScale','log', 'YScale','log')
 title('One-sided Power Spectrum');
@@ -59,14 +66,65 @@ xlabel('Frequency [Hz]', 'Interpreter', 'latex');
 
 title(a, '$\sqrt{accX^2 + accY^2 + accZ^2}, \: 9 \: segments$', 'Interpreter', 'latex')
 
-% % satisfies Parseval's Theorem: these should be equal
-% disp(['Energy in time domain : ', num2str(mean(x.^2))])
-% for i = 1:length(nseg)
-%     df = max(diff(fout{i}));
-%     disp(['Windows : ', num2str(nseg(i))])
-%     disp(['gabespectra(.) energy in frequency domain : ', num2str(sum(Pout{i}*df))])
-% end
+%% velocity :
+for i = 1:count-1
+    vec = [vel_x{i}, vel_y{i}, vel_z{i}];
+    x = sqrt(sum(vec.^2, 2));
+    [Pout{i}, fout{i}, errbars{i}] = gabespectra(x, dt, nseg);
+end
 
+figure; a = tiledlayout(2, 1);
+nexttile; hold on;
+for i = 1:count-1
+    plot(fout{i}, Pout{i})
+end
+title('One-sided Power Spectrum');
+ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
+xlabel('Frequency [Hz]', 'Interpreter', 'latex');
+
+nexttile; hold on;
+for i = 1:count-1
+    line_obj(i) = plot(fout{i}, Pout{i});
+end
+set(gca, 'XScale','log', 'YScale','log')
+title('One-sided Power Spectrum');
+ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
+xlabel('Frequency [Hz]', 'Interpreter', 'latex');
+
+title(a, '$\sqrt{velX^2 + velY^2 + velZ^2}, \: 9 \: segments$', 'Interpreter', 'latex')
+
+%% displacement :
+
+for i = 1:count-1
+    vec = [disp_x{i}, disp_y{i}, disp_z{i}];
+    x = sqrt(sum(vec.^2, 2));
+    [Pout{i}, fout{i}, errbars{i}] = gabespectra(x, dt, nseg);
+end
+
+figure; a = tiledlayout(2, 1);
+nexttile; hold on;
+for i = 1:count-1
+    plot(fout{i}, Pout{i})
+end
+title('One-sided Power Spectrum');
+ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
+xlabel('Frequency [Hz]', 'Interpreter', 'latex');
+
+nexttile; hold on;
+for i = 1:count-1
+    line_obj(i) = plot(fout{i}, Pout{i});
+end
+
+% TODO: change these slopes (corresponds to wavenumber which is another ^-2)
+line1 = plot(fout{1}, fout{1}.^(-8));
+line2 = plot(fout{1}, fout{1}.^(-3));
+set(gca, 'XScale','log', 'YScale','log')
+title('One-sided Power Spectrum');
+ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
+xlabel('Frequency [Hz]', 'Interpreter', 'latex');
+legend([line1, line2], {'f^{-8}', 'f^{-3}'})
+
+title(a, '$\sqrt{X^2 + Y^2 + Z^2}, \: 9 \: segments$', 'Interpreter', 'latex')
 
 
 function [Pout, fout, errbars] = gabespectra(x, dt, nseg)
