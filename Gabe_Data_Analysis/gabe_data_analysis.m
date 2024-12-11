@@ -4,7 +4,7 @@ clc;
 
 % Author: Gabriel Gekas
 
-deployment = 2; % choose deployment
+deployment = 1; % choose deployment
 
 dirpath = strrep(pwd, 'Gabe_Data_Analysis', 'drifter'); % get data directory
 dirs = {'/data_dep1', '/data_dep2'}; % define deployments
@@ -159,12 +159,12 @@ legend([mean_line], {'Mean FFT'})
 nexttile(2);
 mean_line = plot(fout{1}, mean(Pmat, 2), 'k-', 'LineWidth', 1.4);
 line1 = plot(fout{1}, fout{1}.^(-4), 'r-', 'LineWidth', 1.4);
-line2 = plot(fout{1}, fout{1}.^(-3), 'b-', 'LineWidth', 1.4);
+% line2 = plot(fout{1}, fout{1}.^(-3), 'b-', 'LineWidth', 1.4);
 set(gca, 'XScale','log', 'YScale','log')
 title('One-sided Power Spectrum');
 ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
 xlabel('Frequency [Hz]', 'Interpreter', 'latex');
-legend([mean_line, line1, line2], {'Mean FFT', 'f^{-4}', 'f^{-3}'})
+legend([mean_line, line1], {'Mean FFT', 'f^{-4}'})
 title(a, ['$\sqrt{X^2 + Y^2 + Z^2}, \:', num2str(nseg), '\: segments', ', \: Deployment: \:', num2str(deployment), '$'], 'Interpreter', 'latex')
 
 
