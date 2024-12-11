@@ -4,13 +4,11 @@ clc;
 
 % Author: Gabriel Gekas
 
-deployment = 1; % choose deployment
+deployment = 2; % choose deployment
 
 dirpath = strrep(pwd, 'Gabe_Data_Analysis', 'drifter'); % get data directory
 dirs = {'/data_dep1', '/data_dep2'}; % define deployments
 DIR = [dirpath, dirs{deployment}];
-start_index = [3, 1]; % start of data file deployment
-end_index = [11, 10]; % end of data file deployment
 
 csvFiles = dir(fullfile(DIR, '*.CSV')); % gets all .csv files
 for i = 1:length(csvFiles)
@@ -19,30 +17,36 @@ for i = 1:length(csvFiles)
     data{i} = readtable(filepath);
 end
 
+start_index = [3, 13]; % start of data file deployment
+end_index = [11, length(csvFiles)-1]; % end of data file deployment
+
 fe = 5; % sampling rate in Hz
-fcut = 1/50; % cutoff frequencies for highpass filter
-order = 2; % order of butterworth highpass filter
+fcut = 1/40; % cutoff frequencies for highpass filter
+order = 4; % order of butterworth highpass filter
 count = 1;
+
+
+figure; hold on;
 for i = start_index(deployment):end_index(deployment)
-    % acc_x{count} = data{i}.accX;
-    % acc_y{count} = data{i}.accY;
-    % acc_z{count} = data{i}.accZ;
-    % 
-    % vel_x{count} = cumtrapz(acc_x{count});
-    % vel_y{count} = cumtrapz(acc_y{count});
-    % vel_z{count} = cumtrapz(acc_z{count});
-    % 
-    % disp_x{count} = cumtrapz(cumtrapz(acc_x{count}));
-    % disp_y{count} = cumtrapz(cumtrapz(acc_y{count}));
-    % disp_z{count} = cumtrapz(cumtrapz(acc_z{count}));
+    plot((i-1)*length(data{i}.accZ) + [1:length(data{i}.accZ)], data{i}.accZ)
+
     ACC = [data{i}.accX, data{i}.accY, data{i}.accZ]';
     [acc{count}, vel{count}, disp{count}] = compute_DISP_high_pass(ACC, fe, fcut, order);
 
     count = count + 1;
 end
 
+
+
+% %% plot the filter :
+% Ordercut=order;
+% Wcut=2*fcut/fe;
+% [b,a] = butter(Ordercut,Wcut,'high');
+% freqz(b,a,[],fe)
+
+
 dt = 1/fe;
-nseg = 6;
+nseg = 5;
 
 %% acceleration :
 for i = 1:count-1
@@ -52,23 +56,36 @@ for i = 1:count-1
 end
 
 figure; a = tiledlayout(2, 1);
-nexttile; hold on;
+nexttile(1); hold on;
+nexttile(2); hold on;
 for i = 1:count-1
+    nexttile(1);
     plot(fout{i}, Pout{i})
+    nexttile(2);
+    plot(fout{i}, Pout{i})
+
+    if i == 1
+        Pmat = Pout{i};
+    else
+        Pmat = [Pmat, Pout{i}];
+    end
 end
+nexttile(1);
+mean_line = plot(fout{1}, mean(Pmat, 2), 'k-', 'LineWidth', 1.4);
 title('One-sided Power Spectrum');
 ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
 xlabel('Frequency [Hz]', 'Interpreter', 'latex');
+legend([mean_line], {'Mean FFT'})
 
-nexttile; hold on;
-for i = 1:count-1
-    line_obj(i) = plot(fout{i}, Pout{i});
-end
+nexttile(2);
+mean_line = plot(fout{1}, mean(Pmat, 2), 'k-', 'LineWidth', 1.4);
 set(gca, 'XScale','log', 'YScale','log')
 title('One-sided Power Spectrum');
 ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
 xlabel('Frequency [Hz]', 'Interpreter', 'latex');
+legend([mean_line], {'Mean FFT'})
 title(a, ['$\sqrt{accX^2 + accY^2 + accZ^2}, \:', num2str(nseg), '\: segments', ', \: Deployment: \:', num2str(deployment), '$'], 'Interpreter', 'latex')
+
 
 %% velocity :
 for i = 1:count-1
@@ -78,23 +95,36 @@ for i = 1:count-1
 end
 
 figure; a = tiledlayout(2, 1);
-nexttile; hold on;
+nexttile(1); hold on;
+nexttile(2); hold on;
 for i = 1:count-1
+    nexttile(1);
     plot(fout{i}, Pout{i})
+    nexttile(2);
+    plot(fout{i}, Pout{i})
+
+    if i == 1
+        Pmat = Pout{i};
+    else
+        Pmat = [Pmat, Pout{i}];
+    end
 end
+nexttile(1);
+mean_line = plot(fout{1}, mean(Pmat, 2), 'k-', 'LineWidth', 1.4);
 title('One-sided Power Spectrum');
 ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
 xlabel('Frequency [Hz]', 'Interpreter', 'latex');
+legend([mean_line], {'Mean FFT'})
 
-nexttile; hold on;
-for i = 1:count-1
-    line_obj(i) = plot(fout{i}, Pout{i});
-end
+nexttile(2);
+mean_line = plot(fout{1}, mean(Pmat, 2), 'k-', 'LineWidth', 1.4);
 set(gca, 'XScale','log', 'YScale','log')
 title('One-sided Power Spectrum');
 ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
 xlabel('Frequency [Hz]', 'Interpreter', 'latex');
-title(a, ['$\sqrt{accX^2 + accY^2 + accZ^2}, \:', num2str(nseg), '\: segments', ', \: Deployment: \:', num2str(deployment), '$'], 'Interpreter', 'latex')
+legend([mean_line], {'Mean FFT'})
+title(a, ['$\sqrt{velX^2 + velY^2 + velZ^2}, \:', num2str(nseg), '\: segments', ', \: Deployment: \:', num2str(deployment), '$'], 'Interpreter', 'latex')
+
 
 %% displacement :
 
@@ -105,28 +135,37 @@ for i = 1:count-1
 end
 
 figure; a = tiledlayout(2, 1);
-nexttile; hold on;
+nexttile(1); hold on;
+nexttile(2); hold on;
 for i = 1:count-1
+    nexttile(1);
     plot(fout{i}, Pout{i})
+    nexttile(2);
+    plot(fout{i}, Pout{i})
+
+    if i == 1
+        Pmat = Pout{i};
+    else
+        Pmat = [Pmat, Pout{i}];
+    end
 end
+nexttile(1);
+mean_line = plot(fout{1}, mean(Pmat, 2), 'k-', 'LineWidth', 1.4);
 title('One-sided Power Spectrum');
 ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
 xlabel('Frequency [Hz]', 'Interpreter', 'latex');
+legend([mean_line], {'Mean FFT'})
 
-nexttile; hold on;
-for i = 1:count-1
-    line_obj(i) = plot(fout{i}, Pout{i});
-end
-
-% TODO: change these slopes (corresponds to wavenumber which is another ^-2)
-line1 = plot(fout{1}, fout{1}.^(-4), 'r-', 'LineWidth', 1.2);
-line2 = plot(fout{1}, fout{1}.^(-3), 'b-', 'LineWidth', 1.2);
+nexttile(2);
+mean_line = plot(fout{1}, mean(Pmat, 2), 'k-', 'LineWidth', 1.4);
+line1 = plot(fout{1}, fout{1}.^(-4), 'r-', 'LineWidth', 1.4);
+line2 = plot(fout{1}, fout{1}.^(-3), 'b-', 'LineWidth', 1.4);
 set(gca, 'XScale','log', 'YScale','log')
 title('One-sided Power Spectrum');
 ylabel('Power [$$ \frac{units^2}{Hz} $$]', 'Interpreter', 'latex');
 xlabel('Frequency [Hz]', 'Interpreter', 'latex');
-legend([line1, line2], {'f^{-4}', 'f^{-3}'})
-title(a, ['$\sqrt{accX^2 + accY^2 + accZ^2}, \:', num2str(nseg), '\: segments', ', \: Deployment: \:', num2str(deployment), '$'], 'Interpreter', 'latex')
+legend([mean_line, line1, line2], {'Mean FFT', 'f^{-4}', 'f^{-3}'})
+title(a, ['$\sqrt{X^2 + Y^2 + Z^2}, \:', num2str(nseg), '\: segments', ', \: Deployment: \:', num2str(deployment), '$'], 'Interpreter', 'latex')
 
 
 function [Pout, fout, errbars] = gabespectra(x, dt, nseg)
